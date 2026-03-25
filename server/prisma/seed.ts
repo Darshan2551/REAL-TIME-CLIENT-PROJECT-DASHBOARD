@@ -1,5 +1,8 @@
-import { NotificationType, PrismaClient, Role, TaskPriority, TaskStatus } from "@prisma/client";
+import prismaPkg from "@prisma/client";
+import type { TaskPriority as PrismaTaskPriority, TaskStatus as PrismaTaskStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
+
+const { NotificationType, PrismaClient, Role, TaskPriority, TaskStatus } = prismaPkg;
 
 const prisma = new PrismaClient();
 
@@ -75,12 +78,12 @@ const createTaskWithLogs = async (params: {
   assigneeName: string;
   title: string;
   description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
+  status: PrismaTaskStatus;
+  priority: PrismaTaskPriority;
   dueDate: Date;
   logActorId: string;
   logActorName: string;
-  fromStatus?: TaskStatus;
+  fromStatus?: PrismaTaskStatus;
 }) => {
   const task = await prisma.task.create({
     data: {

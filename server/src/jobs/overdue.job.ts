@@ -1,7 +1,9 @@
 import cron from "node-cron";
-import { TaskStatus } from "@prisma/client";
+import prismaPkg from "@prisma/client";
 import { env } from "../config/env.js";
 import { prisma } from "../lib/prisma.js";
+
+const { TaskStatus } = prismaPkg;
 
 let isRunning = false;
 

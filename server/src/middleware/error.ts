@@ -1,7 +1,9 @@
-import { Prisma } from "@prisma/client";
+import prismaPkg from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { AppError } from "../utils/httpError.js";
+
+const { Prisma } = prismaPkg;
 
 export const notFoundHandler = (_req: Request, res: Response) => {
   res.status(StatusCodes.NOT_FOUND).json({

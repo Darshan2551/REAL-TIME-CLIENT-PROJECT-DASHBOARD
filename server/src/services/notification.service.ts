@@ -1,10 +1,13 @@
-import { NotificationType } from "@prisma/client";
+import prismaPkg from "@prisma/client";
+import type { NotificationType as PrismaNotificationType } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { emitNotificationCount, emitNotificationCreated } from "./socket.service.js";
 
+const { NotificationType } = prismaPkg;
+
 export const createNotification = async (params: {
   userId: string;
-  type: NotificationType;
+  type: PrismaNotificationType;
   message: string;
   projectId?: number;
   taskId?: number;

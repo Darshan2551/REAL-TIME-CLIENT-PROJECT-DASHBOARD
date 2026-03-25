@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { NotificationType, TaskPriority, TaskStatus, type Prisma } from "@prisma/client";
+import prismaPkg from "@prisma/client";
+import type { Prisma, TaskPriority as PrismaTaskPriority, TaskStatus as PrismaTaskStatus } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 import { validateBody, validateParams, validateQuery } from "../middleware/validate.js";
@@ -12,9 +13,11 @@ import { badRequest } from "../utils/httpError.js";
 import { idParamSchema, projectIdParamSchema, taskFiltersSchema } from "../validators/common.js";
 import { createTaskSchema, reassignTaskSchema, updateTaskStatusSchema } from "../validators/task.js";
 
+const { NotificationType, TaskPriority, TaskStatus } = prismaPkg;
+
 export const tasksRouter = Router();
 
-const priorityOrder: Record<TaskPriority, number> = {
+const priorityOrder: Record<PrismaTaskPriority, number> = {
   CRITICAL: 1,
   HIGH: 2,
   MEDIUM: 3,
@@ -37,8 +40,8 @@ const buildTaskWhere = (authUser: { userId: string; role: "ADMIN" | "PROJECT_MAN
           };
 
   const typed = query as {
-    status?: TaskStatus;
-    priority?: TaskPriority;
+    status?: PrismaTaskStatus;
+    priority?: PrismaTaskPriority;
     dueFrom?: string;
     dueTo?: string;
     projectId?: number;
@@ -217,7 +220,7 @@ tasksRouter.patch(
   asyncHandler(async (req, res) => {
     const authUser = req.authUser!;
     const taskId = Number(req.params.id);
-    const { status } = req.body as { status: TaskStatus };
+    const { status } = req.body as { status: PrismaTaskStatus };
 
     const task = await assertCanAccessTask(authUser, taskId);
 

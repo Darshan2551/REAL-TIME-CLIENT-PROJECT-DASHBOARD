@@ -1,14 +1,17 @@
 import { endOfWeek, startOfWeek } from "date-fns";
 import { Router } from "express";
-import { TaskPriority } from "@prisma/client";
+import prismaPkg from "@prisma/client";
+import type { TaskPriority as PrismaTaskPriority } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 import { presenceService } from "../services/presence.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+const { TaskPriority } = prismaPkg;
+
 export const dashboardRouter = Router();
 
-const priorityOrder: Record<TaskPriority, number> = {
+const priorityOrder: Record<PrismaTaskPriority, number> = {
   CRITICAL: 1,
   HIGH: 2,
   MEDIUM: 3,
