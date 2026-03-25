@@ -11,25 +11,25 @@ import { notificationsRouter } from "./routes/notifications.route.js";
 import { projectsRouter } from "./routes/projects.route.js";
 import { tasksRouter } from "./routes/tasks.route.js";
 import { usersRouter } from "./routes/users.route.js";
+import { Request, Response } from "express";
 
 export const app = express();
 
 app.use(
   cors({
     origin: env.CLIENT_ORIGIN,
-    credentials: true
-  })
+    credentials: true,
+  }),
 );
 
 app.use(express.json());
 app.use(cookieParser());
-
-app.get("/api/health", (_req, res) => {
+app.get("/health", (_req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
-      status: "ok"
-    }
+      status: "ok",
+    },
   });
 });
 
