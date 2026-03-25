@@ -30,14 +30,15 @@ export const LoginPage = () => {
   return (
     <main className="auth-page">
       <form className="auth-card" onSubmit={onSubmit}>
-        <h1>Agency Command Board</h1>
-        <p>Sign in with a seeded account.</p>
+        <h1>Darshan Command Board</h1>
+        <p>Sign in to the Darshan workspace.</p>
         <label htmlFor="email">Email</label>
         <input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
         <label htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
+          autoComplete="current-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />

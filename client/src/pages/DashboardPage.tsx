@@ -15,6 +15,7 @@ export const DashboardPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<number | "">("");
   const [loading, setLoading] = useState(true);
+  const [refreshVersion, setRefreshVersion] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -35,7 +36,11 @@ export const DashboardPage = () => {
     };
 
     load().catch(() => setLoading(false));
-  }, [user]);
+  }, [user, refreshVersion]);
+
+  const refreshDashboard = () => {
+    setRefreshVersion((current) => current + 1);
+  };
 
   useEffect(() => {
     if (!socket || !user || user.role !== "ADMIN") {
@@ -108,7 +113,7 @@ export const DashboardPage = () => {
     <main className="dashboard">
       <header className="topbar">
         <div>
-          <h1>Client Project Dashboard</h1>
+          <h1>Darshan Project Dashboard</h1>
           <p>
             {user.name} ({user.role})
           </p>
@@ -132,13 +137,15 @@ export const DashboardPage = () => {
         ))}
       </section>
 
-      {user.role !== "DEVELOPER" ? <ManagementPanel isPm={user.role === "PROJECT_MANAGER"} /> : null}
+      {user.role !== "DEVELOPER" ? (
+        <ManagementPanel isPm={user.role === "PROJECT_MANAGER"} onDataChanged={refreshDashboard} />
+      ) : null}
 
-      <TaskBoard role={user.role} />
+      <TaskBoard role={user.role} onTasksChanged={refreshDashboard} />
 
       <section className="panel">
         <div className="panel-head">
-          <h3>Project Activity View</h3>
+          <h3>Darshan Activity View</h3>
         </div>
 
         <select
@@ -155,9 +162,13 @@ export const DashboardPage = () => {
       </section>
 
       <section className="feed-grid">
-        <ActivityFeed title="Global Activity Feed" />
+        <ActivityFeed title="Darshan Activity Feed" />
         {selectedProjectId ? (
-          <ActivityFeed key={selectedProjectId} title={`Project #${selectedProjectId} Live Feed`} projectId={selectedProjectId} />
+          <ActivityFeed
+            key={selectedProjectId}
+            title={`Darshan Project #${selectedProjectId} Live Feed`}
+            projectId={selectedProjectId}
+          />
         ) : (
           <section className="panel empty-feed">
             <p>Select a project to join its live room.</p>

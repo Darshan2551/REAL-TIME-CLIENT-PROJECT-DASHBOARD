@@ -7,9 +7,10 @@ const statusOptions: TaskStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"]
 
 type Props = {
   isPm: boolean;
+  onDataChanged?: () => void;
 };
 
-export const ManagementPanel = ({ isPm }: Props) => {
+export const ManagementPanel = ({ isPm, onDataChanged }: Props) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [developers, setDevelopers] = useState<User[]>([]);
@@ -58,6 +59,7 @@ export const ManagementPanel = ({ isPm }: Props) => {
     setClientName("");
     setClientEmail("");
     await loadData();
+    onDataChanged?.();
   };
 
   const createProject = async () => {
@@ -75,6 +77,7 @@ export const ManagementPanel = ({ isPm }: Props) => {
     setProjectDescription("");
     setProjectClientId("");
     await loadData();
+    onDataChanged?.();
   };
 
   const createTask = async () => {
@@ -97,12 +100,14 @@ export const ManagementPanel = ({ isPm }: Props) => {
     setTaskStatus("TODO");
     setTaskPriority("MEDIUM");
     setTaskDueDate("");
+    await loadData();
+    onDataChanged?.();
   };
 
   return (
     <section className="panel">
       <div className="panel-head">
-        <h3>{isPm ? "PM Controls" : "Admin Controls"}</h3>
+        <h3>{isPm ? "Darshan PM Controls" : "Darshan Admin Controls"}</h3>
       </div>
 
       <div className="manager-grid">

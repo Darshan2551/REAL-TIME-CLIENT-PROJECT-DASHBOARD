@@ -192,14 +192,36 @@ tasksRouter.post(
     });
 
     // this one is kinda noisy but helps timeline look real
-    await prisma.taskActivity.create({
+    const activity = await prisma.taskActivity.create({
       data: {
         taskId: task.id,
         projectId,
         actorId: authUser.userId,
         action: "TASK_CREATED",
         message: `Task #${task.id} created and assigned to ${developer.name}`
+      },
+      include: {
+        actor: {
+          select: {
+            id: true,
+            name: true,
+            role: true
+          }
+        }
       }
+    });
+
+    emitActivityUpdate({
+      id: activity.id,
+      projectId: activity.projectId,
+      taskId: activity.taskId,
+      message: activity.message,
+      fromStatus: activity.fromStatus,
+      toStatus: activity.toStatus,
+      createdAt: activity.createdAt,
+      actor: activity.actor,
+      projectOwnerId: project.createdById,
+      assignedDeveloperId: task.assignedDeveloperId
     });
 
     res.status(201).json({

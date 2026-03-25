@@ -13,7 +13,7 @@ const seedUsers = async () => {
 
   const users = {
     admin: {
-      name: "Aarav Admin",
+      name: "Darshan Admin",
       email: "admin@agency.local",
       role: Role.ADMIN
     },

@@ -6,12 +6,13 @@ import type { Role, Task, TaskPriority, TaskStatus } from "../types/models";
 
 type Props = {
   role: Role;
+  onTasksChanged?: () => void;
 };
 
 const statusOptions: TaskStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 const priorityOptions: TaskPriority[] = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
 
-export const TaskBoard = ({ role }: Props) => {
+export const TaskBoard = ({ role, onTasksChanged }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
@@ -77,6 +78,7 @@ export const TaskBoard = ({ role }: Props) => {
   const updateStatus = async (taskId: number, nextStatus: TaskStatus) => {
     await api.patch(`/tasks/${taskId}/status`, { status: nextStatus });
     await loadTasks();
+    onTasksChanged?.();
   };
 
   return (
