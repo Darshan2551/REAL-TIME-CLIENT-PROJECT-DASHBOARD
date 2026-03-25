@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityFeed } from "../components/ActivityFeed";
 import { ManagementPanel } from "../components/ManagementPanel";
 import { NotificationBell } from "../components/NotificationBell";
@@ -8,6 +8,12 @@ import { useSocket } from "../context/SocketContext";
 import { api } from "../lib/api";
 import type { Project } from "../types/models";
 
+type Toast = {
+  id: number;
+  message: string;
+  tone: "success" | "error";
+};
+
 export const DashboardPage = () => {
   const { user, logout } = useAuth();
   const { socket } = useSocket();
@@ -16,6 +22,7 @@ export const DashboardPage = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<number | "">("");
   const [loading, setLoading] = useState(true);
   const [refreshVersion, setRefreshVersion] = useState(0);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -41,6 +48,16 @@ export const DashboardPage = () => {
   const refreshDashboard = () => {
     setRefreshVersion((current) => current + 1);
   };
+
+  const pushToast = useCallback((message: string, tone: "success" | "error" = "success") => {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+
+    setToasts((current) => [...current, { id, message, tone }]);
+
+    window.setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== id));
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     if (!socket || !user || user.role !== "ADMIN") {
@@ -111,6 +128,16 @@ export const DashboardPage = () => {
 
   return (
     <main className="dashboard">
+      {toasts.length > 0 ? (
+        <div className="toast-stack" aria-live="polite" aria-atomic="true">
+          {toasts.map((toast) => (
+            <div key={toast.id} className={`toast toast-${toast.tone}`}>
+              {toast.message}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       <header className="topbar">
         <div>
           <h1>Darshan Project Dashboard</h1>
@@ -138,10 +165,14 @@ export const DashboardPage = () => {
       </section>
 
       {user.role !== "DEVELOPER" ? (
-        <ManagementPanel isPm={user.role === "PROJECT_MANAGER"} onDataChanged={refreshDashboard} />
+        <ManagementPanel
+          isPm={user.role === "PROJECT_MANAGER"}
+          onDataChanged={refreshDashboard}
+          onNotify={pushToast}
+        />
       ) : null}
 
-      <TaskBoard role={user.role} onTasksChanged={refreshDashboard} />
+      <TaskBoard role={user.role} refreshKey={refreshVersion} onTasksChanged={refreshDashboard} onNotify={pushToast} />
 
       <section className="panel">
         <div className="panel-head">

@@ -7,12 +7,14 @@ import type { Role, Task, TaskPriority, TaskStatus } from "../types/models";
 type Props = {
   role: Role;
   onTasksChanged?: () => void;
+  refreshKey?: number;
+  onNotify?: (message: string, tone?: "success" | "error") => void;
 };
 
 const statusOptions: TaskStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 const priorityOptions: TaskPriority[] = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
 
-export const TaskBoard = ({ role, onTasksChanged }: Props) => {
+export const TaskBoard = ({ role, onTasksChanged, refreshKey, onNotify }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,12 +75,17 @@ export const TaskBoard = ({ role, onTasksChanged }: Props) => {
 
   useEffect(() => {
     loadTasks().catch(() => undefined);
-  }, [searchParams]);
+  }, [searchParams, refreshKey]);
 
   const updateStatus = async (taskId: number, nextStatus: TaskStatus) => {
-    await api.patch(`/tasks/${taskId}/status`, { status: nextStatus });
-    await loadTasks();
-    onTasksChanged?.();
+    try {
+      await api.patch(`/tasks/${taskId}/status`, { status: nextStatus });
+      await loadTasks();
+      onTasksChanged?.();
+      onNotify?.("Task updated successfully.");
+    } catch {
+      onNotify?.("Could not update task.", "error");
+    }
   };
 
   return (

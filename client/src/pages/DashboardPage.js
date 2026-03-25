@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityFeed } from "../components/ActivityFeed";
 import { ManagementPanel } from "../components/ManagementPanel";
 import { NotificationBell } from "../components/NotificationBell";
@@ -15,6 +15,7 @@ export const DashboardPage = () => {
     const [selectedProjectId, setSelectedProjectId] = useState("");
     const [loading, setLoading] = useState(true);
     const [refreshVersion, setRefreshVersion] = useState(0);
+    const [toasts, setToasts] = useState([]);
     useEffect(() => {
         if (!user) {
             return;
@@ -32,6 +33,13 @@ export const DashboardPage = () => {
     const refreshDashboard = () => {
         setRefreshVersion((current) => current + 1);
     };
+    const pushToast = useCallback((message, tone = "success") => {
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        setToasts((current) => [...current, { id, message, tone }]);
+        window.setTimeout(() => {
+            setToasts((current) => current.filter((toast) => toast.id !== id));
+        }, 3000);
+    }, []);
     useEffect(() => {
         if (!socket || !user || user.role !== "ADMIN") {
             return;
@@ -88,5 +96,5 @@ export const DashboardPage = () => {
     if (!user) {
         return null;
     }
-    return (_jsxs("main", { className: "dashboard", children: [_jsxs("header", { className: "topbar", children: [_jsxs("div", { children: [_jsx("h1", { children: "Darshan Project Dashboard" }), _jsxs("p", { children: [user.name, " (", user.role, ")"] })] }), _jsxs("div", { className: "topbar-right", children: [_jsx(NotificationBell, {}), _jsx("button", { type: "button", onClick: logout, children: "Log out" })] })] }), loading ? _jsx("p", { className: "muted", children: "Loading dashboard..." }) : null, _jsx("section", { className: "summary-grid", children: summaryItems.map((item) => (_jsxs("article", { className: "summary-card", children: [_jsx("small", { children: item.label }), _jsx("strong", { children: item.value })] }, item.label))) }), user.role !== "DEVELOPER" ? (_jsx(ManagementPanel, { isPm: user.role === "PROJECT_MANAGER", onDataChanged: refreshDashboard })) : null, _jsx(TaskBoard, { role: user.role, onTasksChanged: refreshDashboard }), _jsxs("section", { className: "panel", children: [_jsx("div", { className: "panel-head", children: _jsx("h3", { children: "Darshan Activity View" }) }), _jsxs("select", { value: selectedProjectId, onChange: (event) => setSelectedProjectId(event.target.value ? Number(event.target.value) : ""), children: [_jsx("option", { value: "", children: "Choose project room" }), projects.map((project) => (_jsxs("option", { value: project.id, children: ["#", project.id, " ", project.name] }, project.id)))] })] }), _jsxs("section", { className: "feed-grid", children: [_jsx(ActivityFeed, { title: "Darshan Activity Feed" }), selectedProjectId ? (_jsx(ActivityFeed, { title: `Darshan Project #${selectedProjectId} Live Feed`, projectId: selectedProjectId }, selectedProjectId)) : (_jsx("section", { className: "panel empty-feed", children: _jsx("p", { children: "Select a project to join its live room." }) }))] })] }));
+    return (_jsxs("main", { className: "dashboard", children: [toasts.length > 0 ? (_jsx("div", { className: "toast-stack", "aria-live": "polite", "aria-atomic": "true", children: toasts.map((toast) => (_jsx("div", { className: `toast toast-${toast.tone}`, children: toast.message }, toast.id))) })) : null, _jsxs("header", { className: "topbar", children: [_jsxs("div", { children: [_jsx("h1", { children: "Darshan Project Dashboard" }), _jsxs("p", { children: [user.name, " (", user.role, ")"] })] }), _jsxs("div", { className: "topbar-right", children: [_jsx(NotificationBell, {}), _jsx("button", { type: "button", onClick: logout, children: "Log out" })] })] }), loading ? _jsx("p", { className: "muted", children: "Loading dashboard..." }) : null, _jsx("section", { className: "summary-grid", children: summaryItems.map((item) => (_jsxs("article", { className: "summary-card", children: [_jsx("small", { children: item.label }), _jsx("strong", { children: item.value })] }, item.label))) }), user.role !== "DEVELOPER" ? (_jsx(ManagementPanel, { isPm: user.role === "PROJECT_MANAGER", onDataChanged: refreshDashboard, onNotify: pushToast })) : null, _jsx(TaskBoard, { role: user.role, refreshKey: refreshVersion, onTasksChanged: refreshDashboard, onNotify: pushToast }), _jsxs("section", { className: "panel", children: [_jsx("div", { className: "panel-head", children: _jsx("h3", { children: "Darshan Activity View" }) }), _jsxs("select", { value: selectedProjectId, onChange: (event) => setSelectedProjectId(event.target.value ? Number(event.target.value) : ""), children: [_jsx("option", { value: "", children: "Choose project room" }), projects.map((project) => (_jsxs("option", { value: project.id, children: ["#", project.id, " ", project.name] }, project.id)))] })] }), _jsxs("section", { className: "feed-grid", children: [_jsx(ActivityFeed, { title: "Darshan Activity Feed" }), selectedProjectId ? (_jsx(ActivityFeed, { title: `Darshan Project #${selectedProjectId} Live Feed`, projectId: selectedProjectId }, selectedProjectId)) : (_jsx("section", { className: "panel empty-feed", children: _jsx("p", { children: "Select a project to join its live room." }) }))] })] }));
 };

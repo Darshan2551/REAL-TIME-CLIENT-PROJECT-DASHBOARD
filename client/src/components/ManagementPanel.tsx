@@ -8,9 +8,10 @@ const statusOptions: TaskStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"]
 type Props = {
   isPm: boolean;
   onDataChanged?: () => void;
+  onNotify?: (message: string, tone?: "success" | "error") => void;
 };
 
-export const ManagementPanel = ({ isPm, onDataChanged }: Props) => {
+export const ManagementPanel = ({ isPm, onDataChanged, onNotify }: Props) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [developers, setDevelopers] = useState<User[]>([]);
@@ -51,15 +52,20 @@ export const ManagementPanel = ({ isPm, onDataChanged }: Props) => {
       return;
     }
 
-    await api.post("/clients", {
-      name: clientName.trim(),
-      ...(clientEmail.trim() ? { contactEmail: clientEmail.trim() } : {})
-    });
+    try {
+      await api.post("/clients", {
+        name: clientName.trim(),
+        ...(clientEmail.trim() ? { contactEmail: clientEmail.trim() } : {})
+      });
 
-    setClientName("");
-    setClientEmail("");
-    await loadData();
-    onDataChanged?.();
+      setClientName("");
+      setClientEmail("");
+      await loadData();
+      onDataChanged?.();
+      onNotify?.("Client created successfully.");
+    } catch {
+      onNotify?.("Could not create client.", "error");
+    }
   };
 
   const createProject = async () => {
@@ -67,17 +73,22 @@ export const ManagementPanel = ({ isPm, onDataChanged }: Props) => {
       return;
     }
 
-    await api.post("/projects", {
-      name: projectName.trim(),
-      description: projectDescription.trim(),
-      clientId: Number(projectClientId)
-    });
+    try {
+      await api.post("/projects", {
+        name: projectName.trim(),
+        description: projectDescription.trim(),
+        clientId: Number(projectClientId)
+      });
 
-    setProjectName("");
-    setProjectDescription("");
-    setProjectClientId("");
-    await loadData();
-    onDataChanged?.();
+      setProjectName("");
+      setProjectDescription("");
+      setProjectClientId("");
+      await loadData();
+      onDataChanged?.();
+      onNotify?.("Project created successfully.");
+    } catch {
+      onNotify?.("Could not create project.", "error");
+    }
   };
 
   const createTask = async () => {
@@ -85,23 +96,28 @@ export const ManagementPanel = ({ isPm, onDataChanged }: Props) => {
       return;
     }
 
-    await api.post(`/tasks/project/${taskProjectId}`, {
-      title: taskTitle.trim(),
-      description: taskDescription.trim(),
-      assignedDeveloperId: taskDeveloperId,
-      status: taskStatus,
-      priority: taskPriority,
-      dueDate: new Date(taskDueDate).toISOString()
-    });
+    try {
+      await api.post(`/tasks/project/${taskProjectId}`, {
+        title: taskTitle.trim(),
+        description: taskDescription.trim(),
+        assignedDeveloperId: taskDeveloperId,
+        status: taskStatus,
+        priority: taskPriority,
+        dueDate: new Date(taskDueDate).toISOString()
+      });
 
-    setTaskTitle("");
-    setTaskDescription("");
-    setTaskDeveloperId("");
-    setTaskStatus("TODO");
-    setTaskPriority("MEDIUM");
-    setTaskDueDate("");
-    await loadData();
-    onDataChanged?.();
+      setTaskTitle("");
+      setTaskDescription("");
+      setTaskDeveloperId("");
+      setTaskStatus("TODO");
+      setTaskPriority("MEDIUM");
+      setTaskDueDate("");
+      await loadData();
+      onDataChanged?.();
+      onNotify?.("Task created successfully.");
+    } catch {
+      onNotify?.("Could not create task.", "error");
+    }
   };
 
   return (

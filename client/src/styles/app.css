@@ -37,6 +37,37 @@ textarea {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1rem;
+  position: relative;
+}
+
+.toast-stack {
+  position: sticky;
+  top: 1rem;
+  z-index: 30;
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.toast {
+  border-radius: 12px;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--line);
+  background: #fffef8;
+  box-shadow: 0 12px 28px rgba(27, 42, 52, 0.1);
+  font-weight: 500;
+}
+
+.toast-success {
+  border-color: #b8d8b3;
+  background: #eef8eb;
+  color: var(--ok);
+}
+
+.toast-error {
+  border-color: #efc1b5;
+  background: #fff0ec;
+  color: var(--warn);
 }
 
 .centered {
