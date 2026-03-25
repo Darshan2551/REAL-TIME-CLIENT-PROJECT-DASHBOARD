@@ -1,0 +1,12 @@
+node_modules/
+**/node_modules/
+**/dist/
+**/.vite/
+.env
+**/.env
+**/.env.local
+*.log
+.DS_Store
+coverage/
+.prisma/
+PROJECT_COMPLETE_EXPLANATION.txt
